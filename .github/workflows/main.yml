@@ -1,0 +1,41 @@
+name: Construire Camera2Gallery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Installer Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Installer les composants Android
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Construire le fichier APK
+        run: gradle assembleDebug
+
+      - name: Recuperer le fichier APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Camera2Gallery-APK
+          path: app/build/outputs/apk/debug/*.apk
